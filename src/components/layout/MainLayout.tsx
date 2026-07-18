@@ -61,7 +61,7 @@ const MainLayout: React.FC = () => {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
-          <span className="text-xl font-bold text-gray-900 tracking-tight">Forensic Med</span>
+          <span className="text-xl font-bold text-gray-900 tracking-tight">ForenSys</span>
           <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-gray-500">
             <X className="w-6 h-6" />
           </button>
