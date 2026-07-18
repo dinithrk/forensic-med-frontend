@@ -5,10 +5,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './features/auth/Login';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './features/dashboard/Dashboard';
+import PatientList from './features/patients/PatientList';
+import PatientForm from './features/patients/PatientForm';
 
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
-const Patients = () => <div className="p-8 text-xl">Patient Management Module</div>;
 const Cases = () => <div className="p-8 text-xl">Case Management Module</div>;
 const Postmortems = () => <div className="p-8 text-xl">Postmortem Management Module</div>;
 const Evidence = () => <div className="p-8 text-xl">Evidence / Chain of Custody Module</div>;
@@ -38,14 +39,32 @@ const App: React.FC = () => {
             
             <Route path="dashboard" element={<Dashboard />} />
             
-            <Route 
-              path="patients" 
-              element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
-                  <Patients />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="patients">
+              <Route 
+                index 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <PatientList />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="new" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <PatientForm />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":id" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <PatientForm />
+                  </ProtectedRoute>
+                } 
+              />
+            </Route>
 
             <Route 
               path="cases" 
