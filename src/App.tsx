@@ -7,10 +7,11 @@ import MainLayout from './components/layout/MainLayout';
 import Dashboard from './features/dashboard/Dashboard';
 import PatientList from './features/patients/PatientList';
 import PatientForm from './features/patients/PatientForm';
+import CaseList from './features/cases/CaseList';
+import CaseForm from './features/cases/CaseForm';
 
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
-const Cases = () => <div className="p-8 text-xl">Case Management Module</div>;
 const Postmortems = () => <div className="p-8 text-xl">Postmortem Management Module</div>;
 const Evidence = () => <div className="p-8 text-xl">Evidence / Chain of Custody Module</div>;
 const Reports = () => <div className="p-8 text-xl">Court Report Management</div>;
@@ -66,14 +67,32 @@ const App: React.FC = () => {
               />
             </Route>
 
-            <Route 
-              path="cases" 
-              element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER', 'POLICE_OFFICER']}>
-                  <Cases />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="cases">
+              <Route 
+                index 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER', 'POLICE_OFFICER']}>
+                    <CaseList />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="new" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <CaseForm />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":id" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <CaseForm />
+                  </ProtectedRoute>
+                } 
+              />
+            </Route>
 
             <Route 
               path="postmortems" 
