@@ -4,11 +4,9 @@ export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'UNKNOWN';
 
 export interface IdentifierDto {
   identifierId?: number;
-  identifierName?: string;
-  relationship?: string;
-  contactNo?: string;
-  address?: string;
-  nicNo?: string;
+  fullName?: string;
+  nicNumber?: string;
+  residingAddress?: string;
 }
 
 export interface InquestOrderDto {
@@ -102,6 +100,10 @@ export const deceasedService = {
   create: async (data: DeceasedDto): Promise<DeceasedDto> => {
     const response = await api.post('/deceased', data);
     return response.data;
+  },
+  update: async (id: number, data: DeceasedDto): Promise<DeceasedDto> => {
+    const response = await api.put(`/deceased/${id}`, data);
+    return response.data;
   }
 };
 
@@ -116,6 +118,10 @@ export const postMortemService = {
   },
   create: async (deceasedId: number, data: PostMortemDto): Promise<PostMortemDto> => {
     const response = await api.post(`/deceased/${deceasedId}/post-mortems`, data);
+    return response.data;
+  },
+  update: async (deceasedId: number, pmId: number, data: PostMortemDto): Promise<PostMortemDto> => {
+    const response = await api.put(`/deceased/${deceasedId}/post-mortems/${pmId}`, data);
     return response.data;
   },
   finalizeAutopsy: async (deceasedId: number, pmId: number, data: AutopsyExamDto): Promise<PostMortemDto> => {

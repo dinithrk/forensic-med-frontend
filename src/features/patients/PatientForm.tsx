@@ -33,7 +33,7 @@ const PatientForm: React.FC = () => {
       const data = await patientService.getById(patientId);
       setFormData({
         ...data,
-        // Ensure nulls from backend are mapped to empty strings for controlled inputs
+        dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '',
         nicNo: data.nicNo || '',
         passportNo: data.passportNo || '',
         address: data.address || '',

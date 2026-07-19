@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deceasedService, type DeceasedDto } from '../../services/postmortem.service';
-import { Plus, Search, FileText, Loader2, AlertCircle, Users } from 'lucide-react';
+import { Plus, Search, Eye, Loader2, AlertCircle, Users } from 'lucide-react';
 
 const PostmortemList: React.FC = () => {
   const [deceasedList, setDeceasedList] = useState<DeceasedDto[]>([]);
@@ -47,7 +47,7 @@ const PostmortemList: React.FC = () => {
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm text-sm font-medium"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Register New Postmortem
+          Register Admitted Body
         </button>
       </div>
 
@@ -132,9 +132,9 @@ const PostmortemList: React.FC = () => {
                       <button
                         onClick={() => navigate(`/postmortems/${d.deceasedId}`)}
                         className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center"
-                        title="View Autopsies"
+                        title="View Record"
                       >
-                        <FileText className="w-4 h-4 mr-1.5" />
+                        <Eye className="w-4 h-4 mr-1.5" />
                         Autopsies
                       </button>
                     </td>

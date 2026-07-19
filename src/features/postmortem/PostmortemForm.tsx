@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { deceasedService, postMortemService, medicalOfficerService, type DeceasedDto, type PostMortemDto, type AutopsyExamDto, type CauseOfDeathDto, type MedicalOfficerDto, type PreAutopsyInformationDto } from '../../services/postmortem.service';
+import { postMortemService, medicalOfficerService, type PostMortemDto, type AutopsyExamDto, type MedicalOfficerDto } from '../../services/postmortem.service';
 import { Loader2, ArrowLeft, Save, AlertCircle, ChevronRight, Check, Plus, Trash2 } from 'lucide-react';
 
 const PostmortemForm: React.FC = () => {
-  const { deceasedId, pmId } = useParams<{ deceasedId?: string, pmId?: string }>();
+  const { deceasedId, pmId } = useParams<{ deceasedId: string, pmId?: string }>();
   const navigate = useNavigate();
 
   const [activeStep, setActiveStep] = useState<number>(1);
@@ -12,22 +12,9 @@ const PostmortemForm: React.FC = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const [currentDeceasedId, setCurrentDeceasedId] = useState<number | null>(deceasedId ? parseInt(deceasedId) : null);
+  const currentDeceasedId = parseInt(deceasedId!);
   const [currentPmId, setCurrentPmId] = useState<number | null>(pmId ? parseInt(pmId) : null);
   const [officers, setOfficers] = useState<MedicalOfficerDto[]>([]);
-
-  const [deceasedData, setDeceasedData] = useState<DeceasedDto>({
-    fullName: '',
-    sex: 'UNKNOWN',
-    ageWhenDied: undefined,
-    lastAddress: '',
-    placeOfDeath: '',
-    hospitalName: '',
-    bhtNo: '',
-    wardNo: '',
-    dateOfDeath: '',
-    timeOfDeath: ''
-  });
 
   const [pmData, setPmData] = useState<PostMortemDto>({
     dateTimeOfPmExam: '',
@@ -35,7 +22,7 @@ const PostmortemForm: React.FC = () => {
     district: '',
     underInvestigation: false,
     specimensRetained: false,
-    deceasedId: 0,
+    deceasedId: currentDeceasedId,
     medicalOfficerIds: [],
     preAutopsyInformation: []
   });
@@ -47,43 +34,34 @@ const PostmortemForm: React.FC = () => {
   });
 
   useEffect(() => {
+    if (!deceasedId) {
+      setError("Deceased ID is required to register an autopsy.");
+      setInitialLoading(false);
+      return;
+    }
+
     const loadExistingData = async () => {
       try {
         const officersData = await medicalOfficerService.getAll();
         setOfficers(officersData);
 
-        if (deceasedId) {
-          const dData = await deceasedService.getById(parseInt(deceasedId));
-          setDeceasedData({
-            ...dData,
-            fullName: dData.fullName || '',
-            lastAddress: dData.lastAddress || '',
-            placeOfDeath: dData.placeOfDeath || '',
-            hospitalName: dData.hospitalName || '',
-            bhtNo: dData.bhtNo || '',
-            wardNo: dData.wardNo || '',
-            dateOfDeath: dData.dateOfDeath || '',
-            timeOfDeath: dData.timeOfDeath || ''
+        if (pmId) {
+          const pData = await postMortemService.getById(currentDeceasedId, parseInt(pmId));
+          setPmData({
+            ...pData,
+            dateTimeOfPmExam: pData.dateTimeOfPmExam ? pData.dateTimeOfPmExam.slice(0, 16) : '',
+            placeOfExamination: pData.placeOfExamination || '',
+            district: pData.district || '',
+            medicalOfficerIds: pData.medicalOfficerIds || [],
+            preAutopsyInformation: pData.preAutopsyInformation || []
           });
           
-          if (pmId) {
-            const pData = await postMortemService.getById(parseInt(deceasedId), parseInt(pmId));
-            setPmData({
-              ...pData,
-              dateTimeOfPmExam: pData.dateTimeOfPmExam || '',
-              placeOfExamination: pData.placeOfExamination || '',
-              district: pData.district || '',
-              medicalOfficerIds: pData.medicalOfficerIds || [],
-              preAutopsyInformation: pData.preAutopsyInformation || []
+          if (pData.autopsyExam) {
+            setExamData({
+              ...pData.autopsyExam,
+              maternalDeathCategory: pData.autopsyExam.maternalDeathCategory || '',
+              causesOfDeath: pData.autopsyExam.causesOfDeath?.length ? pData.autopsyExam.causesOfDeath : [{ causeDescription: '', severity: '' }]
             });
-            
-            if (pData.autopsyExam) {
-              setExamData({
-                ...pData.autopsyExam,
-                maternalDeathCategory: pData.autopsyExam.maternalDeathCategory || '',
-                causesOfDeath: pData.autopsyExam.causesOfDeath?.length ? pData.autopsyExam.causesOfDeath : [{ causeDescription: '', severity: '' }]
-              });
-            }
           }
         }
       } catch (err) {
@@ -94,12 +72,7 @@ const PostmortemForm: React.FC = () => {
     };
 
     loadExistingData();
-  }, [deceasedId, pmId]);
-
-  const handleDeceasedChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setDeceasedData(prev => ({ ...prev, [name]: name === 'ageWhenDied' ? (value ? parseInt(value) : undefined) : value }));
-  };
+  }, [deceasedId, pmId, currentDeceasedId]);
 
   const handlePmChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -155,29 +128,15 @@ const PostmortemForm: React.FC = () => {
     setError(null);
     setLoading(true);
     try {
-      if (!currentDeceasedId) {
-        const result = await deceasedService.create(deceasedData);
-        setCurrentDeceasedId(result.deceasedId!);
-      }
-      setActiveStep(2);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save Deceased record.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleStep2Submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      if (!currentPmId && currentDeceasedId) {
+      if (!currentPmId) {
         const payload = { ...pmData, deceasedId: currentDeceasedId };
         const result = await postMortemService.create(currentDeceasedId, payload);
         setCurrentPmId(result.pmSerialNo!);
+      } else {
+        const payload = { ...pmData, deceasedId: currentDeceasedId };
+        await postMortemService.update(currentDeceasedId, currentPmId, payload);
       }
-      setActiveStep(3);
+      setActiveStep(2);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save Postmortem details.');
     } finally {
@@ -185,7 +144,7 @@ const PostmortemForm: React.FC = () => {
     }
   };
 
-  const handleStep3Submit = async (e: React.FormEvent) => {
+  const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -215,15 +174,16 @@ const PostmortemForm: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
       <div className="flex items-center space-x-4">
         <button
-          onClick={() => navigate(deceasedId ? (pmId ? `/postmortems/${deceasedId}/exam/${pmId}` : `/postmortems/${deceasedId}`) : '/postmortems')}
+          onClick={() => navigate(`/postmortems/${deceasedId}`)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            {deceasedId ? 'Edit Postmortem Record' : 'Register New Postmortem'}
+            {pmId ? 'Edit Postmortem Exam' : 'Register New Autopsy'}
           </h1>
+          <p className="text-sm text-gray-500 mt-1">For Deceased ID: DEC-{deceasedId.padStart(4, '0')}</p>
         </div>
       </div>
 
@@ -236,11 +196,10 @@ const PostmortemForm: React.FC = () => {
 
       {/* Stepper Header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-12">
           {[
-            { step: 1, label: 'Deceased Info' },
-            { step: 2, label: 'Postmortem Details' },
-            { step: 3, label: 'Autopsy Findings' }
+            { step: 1, label: 'Postmortem Details' },
+            { step: 2, label: 'Autopsy Findings' }
           ].map((s, index) => (
             <React.Fragment key={s.step}>
               <div className={`flex flex-col items-center ${activeStep >= s.step ? 'text-blue-600' : 'text-gray-400'}`}>
@@ -253,7 +212,7 @@ const PostmortemForm: React.FC = () => {
                 </div>
                 <span className="text-xs font-medium uppercase tracking-wider">{s.label}</span>
               </div>
-              {index < 2 && (
+              {index < 1 && (
                 <div className={`flex-1 h-0.5 mx-4 ${activeStep > s.step ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
               )}
             </React.Fragment>
@@ -263,59 +222,9 @@ const PostmortemForm: React.FC = () => {
 
       <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
         
-        {/* STEP 1: Deceased */}
+        {/* STEP 1: Postmortem */}
         {activeStep === 1 && (
           <form onSubmit={handleStep1Submit}>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Deceased Individual Information</h3>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                <input type="text" name="fullName" required disabled={!!currentDeceasedId} value={deceasedData.fullName} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
-                <input type="number" name="ageWhenDied" disabled={!!currentDeceasedId} value={deceasedData.ageWhenDied || ''} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Biological Sex *</label>
-                <select name="sex" required disabled={!!currentDeceasedId} value={deceasedData.sex} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
-                  <option value="UNKNOWN">Unknown</option>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Place of Death</label>
-                <input type="text" name="placeOfDeath" disabled={!!currentDeceasedId} value={deceasedData.placeOfDeath} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Death</label>
-                <input type="date" name="dateOfDeath" disabled={!!currentDeceasedId} value={deceasedData.dateOfDeath} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Time of Death</label>
-                <input type="time" name="timeOfDeath" disabled={!!currentDeceasedId} value={deceasedData.timeOfDeath} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100" />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Known Address</label>
-                <input type="text" name="lastAddress" disabled={!!currentDeceasedId} value={deceasedData.lastAddress} onChange={handleDeceasedChange} className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100" />
-              </div>
-            </div>
-            <div className="px-6 py-4 bg-gray-50 border-t flex justify-end">
-              <button type="submit" disabled={loading} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm font-medium disabled:bg-blue-400">
-                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Save & Continue'}
-                {!loading && <ChevronRight className="w-4 h-4 ml-2" />}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* STEP 2: Postmortem */}
-        {activeStep === 2 && (
-          <form onSubmit={handleStep2Submit}>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Postmortem Examination Details</h3>
@@ -411,10 +320,7 @@ const PostmortemForm: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4 bg-gray-50 border-t flex justify-between">
-              <button type="button" onClick={() => setActiveStep(1)} className="px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-md hover:bg-gray-50 transition-colors shadow-sm font-medium">
-                Back
-              </button>
+            <div className="px-6 py-4 bg-gray-50 border-t flex justify-end">
               <button type="submit" disabled={loading} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm font-medium disabled:bg-blue-400">
                 {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Save & Continue'}
                 {!loading && <ChevronRight className="w-4 h-4 ml-2" />}
@@ -423,9 +329,9 @@ const PostmortemForm: React.FC = () => {
           </form>
         )}
 
-        {/* STEP 3: Findings */}
-        {activeStep === 3 && (
-          <form onSubmit={handleStep3Submit}>
+        {/* STEP 2: Findings */}
+        {activeStep === 2 && (
+          <form onSubmit={handleStep2Submit}>
             <div className="p-6 space-y-6">
               <div>
                 <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Final Autopsy Findings</h3>
@@ -476,7 +382,7 @@ const PostmortemForm: React.FC = () => {
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 border-t flex justify-between">
-              <button type="button" onClick={() => setActiveStep(2)} className="px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-md hover:bg-gray-50 transition-colors shadow-sm font-medium">
+              <button type="button" onClick={() => setActiveStep(1)} className="px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-md hover:bg-gray-50 transition-colors shadow-sm font-medium">
                 Back
               </button>
               <button type="submit" disabled={loading} className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm font-medium disabled:bg-green-400">

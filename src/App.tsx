@@ -13,6 +13,7 @@ import CaseForm from './features/cases/CaseForm';
 import CaseView from './features/cases/CaseView';
 import PostmortemList from './features/postmortem/PostmortemList';
 import PostmortemForm from './features/postmortem/PostmortemForm';
+import DeceasedForm from './features/postmortem/DeceasedForm';
 import DeceasedView from './features/postmortem/DeceasedView';
 import PostmortemView from './features/postmortem/PostmortemView';
 
@@ -128,7 +129,7 @@ const App: React.FC = () => {
                 path="new" 
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER']}>
-                    <PostmortemForm />
+                    <DeceasedForm />
                   </ProtectedRoute>
                 } 
               />
@@ -142,6 +143,14 @@ const App: React.FC = () => {
               />
               <Route 
                 path=":deceasedId/edit" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                    <DeceasedForm />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":deceasedId/exam/new" 
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
                     <PostmortemForm />

@@ -62,13 +62,12 @@ const CaseForm: React.FC = () => {
   const fetchCase = async (caseId: number) => {
     try {
       const data = await caseService.getById(caseId);
-      // Ensure null strings become empty strings for controlled inputs
+      // Ensure null strings become empty strings for controlled inputs and dates are formatted properly
       setFormData({
         ...data,
+        policeDateOfIssue: data.policeDateOfIssue ? data.policeDateOfIssue.split('T')[0] : '',
+        dateTimeExamined: data.dateTimeExamined ? data.dateTimeExamined.slice(0, 16) : '',
         policeRefNo: data.policeRefNo || '',
-        policeDateOfIssue: data.policeDateOfIssue || '',
-        reasonForReferral: data.reasonForReferral || '',
-        dateTimeExamined: data.dateTimeExamined || '',
         placeExamined: data.placeExamined || '',
         othersNatureOfHarm: data.othersNatureOfHarm || '',
         breathingSmellIntensity: data.breathingSmellIntensity || '',
@@ -77,9 +76,9 @@ const CaseForm: React.FC = () => {
         hospitalName: data.hospitalName || '',
         hospitalWard: data.hospitalWard || '',
         hospitalBhtNo: data.hospitalBhtNo || '',
-        dateAdmitted: data.dateAdmitted || '',
-        timeAdmitted: data.timeAdmitted || '',
-        dateDischarged: data.dateDischarged || '',
+        dateAdmitted: data.dateAdmitted ? data.dateAdmitted.split('T')[0] : '',
+        timeAdmitted: data.timeAdmitted ? (data.timeAdmitted.includes('T') ? data.timeAdmitted.split('T')[1].slice(0, 5) : data.timeAdmitted.slice(0, 5)) : '',
+        dateDischarged: data.dateDischarged ? data.dateDischarged.split('T')[0] : '',
         remarks: data.remarks || '',
         shortHistoryGivenByPatient: data.shortHistoryGivenByPatient || ''
       });

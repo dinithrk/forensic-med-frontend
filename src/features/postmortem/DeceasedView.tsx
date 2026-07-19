@@ -111,7 +111,7 @@ const DeceasedView: React.FC = () => {
             <h2 className="text-lg font-medium text-gray-900">Postmortem Examinations</h2>
           </div>
           <button
-            onClick={() => navigate(`/postmortems/${deceased.deceasedId}/exam/new/edit`)}
+            onClick={() => navigate(`/postmortems/${deceased.deceasedId}/exam/new`)}
             className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 px-3 py-1.5 rounded-md"
           >
             <Plus className="w-4 h-4 mr-1" /> Register Exam
