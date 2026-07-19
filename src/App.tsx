@@ -7,12 +7,17 @@ import MainLayout from './components/layout/MainLayout';
 import Dashboard from './features/dashboard/Dashboard';
 import PatientList from './features/patients/PatientList';
 import PatientForm from './features/patients/PatientForm';
+import PatientView from './features/patients/PatientView';
 import CaseList from './features/cases/CaseList';
 import CaseForm from './features/cases/CaseForm';
+import CaseView from './features/cases/CaseView';
+import PostmortemList from './features/postmortem/PostmortemList';
+import PostmortemForm from './features/postmortem/PostmortemForm';
+import DeceasedView from './features/postmortem/DeceasedView';
+import PostmortemView from './features/postmortem/PostmortemView';
 
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
-const Postmortems = () => <div className="p-8 text-xl">Postmortem Management Module</div>;
 const Evidence = () => <div className="p-8 text-xl">Evidence / Chain of Custody Module</div>;
 const Reports = () => <div className="p-8 text-xl">Court Report Management</div>;
 const Staff = () => <div className="p-8 text-xl text-blue-700">Staff Management (Admin Only)</div>;
@@ -61,6 +66,14 @@ const App: React.FC = () => {
                 path=":id" 
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <PatientView />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":id/edit" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
                     <PatientForm />
                   </ProtectedRoute>
                 } 
@@ -88,20 +101,70 @@ const App: React.FC = () => {
                 path=":id" 
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
+                    <CaseView />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":id/edit" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER']}>
                     <CaseForm />
                   </ProtectedRoute>
                 } 
               />
             </Route>
 
-            <Route 
-              path="postmortems" 
-              element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER']}>
-                  <Postmortems />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="postmortems">
+              <Route 
+                index 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                    <PostmortemList />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="new" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER']}>
+                    <PostmortemForm />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":deceasedId" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                    <DeceasedView />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":deceasedId/edit" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                    <PostmortemForm />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":deceasedId/exam/:pmId" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                    <PostmortemView />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":deceasedId/exam/:pmId/edit" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                    <PostmortemForm />
+                  </ProtectedRoute>
+                } 
+              />
+            </Route>
 
             <Route 
               path="evidence" 

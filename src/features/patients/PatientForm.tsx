@@ -63,12 +63,10 @@ const PatientForm: React.FC = () => {
     setLoading(true);
 
     try {
-      if (isEditMode && id) {
-        await patientService.update(parseInt(id, 10), formData);
-      } else {
-        await patientService.create(formData);
-      }
-      navigate('/patients');
+      const savedPatient = isEditMode && id 
+        ? await patientService.update(parseInt(id, 10), formData)
+        : await patientService.create(formData);
+      navigate(`/patients/${savedPatient.patientId}`);
     } catch (err: any) {
       console.error(err);
       setError(err.response?.data?.message || 'Failed to save patient. Please check the inputs.');

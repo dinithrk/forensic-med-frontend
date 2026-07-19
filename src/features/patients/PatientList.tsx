@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { patientService, type Patient } from '../../services/patient.service';
-import { Plus, Search, Edit, Loader2 } from 'lucide-react';
+import { Plus, Search, Eye, Loader2 } from 'lucide-react';
 
 const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -138,10 +138,10 @@ const PatientList: React.FC = () => {
                       <button 
                         onClick={() => navigate(`/patients/${patient.patientId}`)}
                         className="text-indigo-600 hover:text-indigo-900 mr-4 inline-flex items-center"
-                        title="View / Edit"
+                        title="View Profile"
                       >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
                       </button>
                     </td>
                   </tr>

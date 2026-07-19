@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { caseService, type MlefRecord } from '../../services/case.service';
-import { Plus, Search, Edit, Eye, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { deceasedService, type DeceasedDto } from '../../services/postmortem.service';
+import { Plus, Search, FileText, Loader2, AlertCircle, Users } from 'lucide-react';
 
-const CaseList: React.FC = () => {
-  const [cases, setCases] = useState<MlefRecord[]>([]);
+const PostmortemList: React.FC = () => {
+  const [deceasedList, setDeceasedList] = useState<DeceasedDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,42 +12,42 @@ const CaseList: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCases();
+    fetchDeceased();
   }, []);
 
-  const fetchCases = async () => {
+  const fetchDeceased = async () => {
     try {
       setLoading(true);
-      const data = await caseService.getAll();
-      setCases(data);
+      const data = await deceasedService.getAll();
+      setDeceasedList(data);
       setError(null);
     } catch (err: any) {
-      setError('Failed to fetch cases. Ensure the backend server is running.');
+      setError('Failed to fetch deceased records. Ensure the backend server is running.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredCases = cases.filter(c => 
-    c.policeRefNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.patientId.toString().includes(searchTerm)
+  const filteredList = deceasedList.filter(d => 
+    d.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    d.deceasedId?.toString().includes(searchTerm)
   );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clinical Forensic Cases</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage Medico-Legal Examination Forms (MLEF)</p>
+          <h1 className="text-2xl font-bold text-gray-900">Postmortem Management</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage Deceased Records and Autopsy Exams</p>
         </div>
         
         <button
-          onClick={() => navigate('/cases/new')}
+          onClick={() => navigate('/postmortems/new')}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm text-sm font-medium"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Register New Case
+          Register New Postmortem
         </button>
       </div>
 
@@ -66,7 +66,7 @@ const CaseList: React.FC = () => {
             </div>
             <input
               type="text"
-              placeholder="Search by Police Ref No or Patient ID..."
+              placeholder="Search by Deceased Name or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
@@ -79,16 +79,16 @@ const CaseList: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Case ID
+                  ID
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Police Ref No
+                  Full Name
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Patient ID
+                  Age/Sex
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date Examined
+                  Date of Death
                 </th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -101,40 +101,41 @@ const CaseList: React.FC = () => {
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center text-gray-500">
                       <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
-                      <p>Loading cases...</p>
+                      <p>Loading records...</p>
                     </div>
                   </td>
                 </tr>
-              ) : filteredCases.length === 0 ? (
+              ) : filteredList.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                    <FileText className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                    <p className="text-base font-medium text-gray-900">No cases found</p>
-                    <p className="text-sm mt-1">Get started by registering a new clinical forensic case.</p>
+                    <Users className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-base font-medium text-gray-900">No records found</p>
+                    <p className="text-sm mt-1">Get started by registering a new postmortem.</p>
                   </td>
                 </tr>
               ) : (
-                filteredCases.map((c) => (
-                  <tr key={c.mlefId} className="hover:bg-gray-50 transition-colors">
+                filteredList.map((d) => (
+                  <tr key={d.deceasedId} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      MLEF-{c.mlefId?.toString().padStart(4, '0')}
+                      DEC-{d.deceasedId?.toString().padStart(4, '0')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {c.policeRefNo || 'N/A'}
+                      {d.fullName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      PT-{c.patientId}
+                      {d.ageWhenDied || '?'} / {d.sex}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {c.dateTimeExamined ? new Date(c.dateTimeExamined).toLocaleString() : 'N/A'}
+                      {d.dateOfDeath || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() => navigate(`/cases/${c.mlefId}`)}
-                        className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-md transition-colors inline-flex items-center"
-                        title="View Record"
+                        onClick={() => navigate(`/postmortems/${d.deceasedId}`)}
+                        className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center"
+                        title="View Autopsies"
                       >
-                        <Eye className="w-4 h-4" />
+                        <FileText className="w-4 h-4 mr-1.5" />
+                        Autopsies
                       </button>
                     </td>
                   </tr>
@@ -148,4 +149,4 @@ const CaseList: React.FC = () => {
   );
 };
 
-export default CaseList;
+export default PostmortemList;
