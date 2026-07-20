@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users, FileText, ClipboardList, Scale } from 'lucide-react';
+import { ReportNotificationsWidget } from '../reports/ReportNotificationsWidget';
 
 const Dashboard: React.FC = () => {
   const metrics = [
@@ -38,10 +39,8 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Placeholder for future activity feed or charts */}
-      <div className="mt-8 bg-white shadow-sm rounded-xl border border-gray-100 p-6 h-64 flex items-center justify-center">
-        <p className="text-gray-400 text-sm italic">Recent Activity Feed (Coming Soon)</p>
-      </div>
+      {/* Forensic Reports & Court Notifications Panel */}
+      <ReportNotificationsWidget />
     </div>
   );
 };

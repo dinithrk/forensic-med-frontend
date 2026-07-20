@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { caseService, type MlefRecord } from '../../services/case.service';
 import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, Crosshair, Shield, Activity, Droplets } from 'lucide-react';
 import { MediaGalleryView } from '../media/MediaGalleryView';
+import { ReportHistoryWidget } from '../reports/ReportHistoryWidget';
 
 const CaseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -279,6 +280,8 @@ const CaseView: React.FC = () => {
           )}
         </div>
       </div>
+      
+      <ReportHistoryWidget caseType="CLINICAL" caseId={Number(id)} />
       
       <MediaGalleryView linkType="CASE" linkId={Number(id)} />
 

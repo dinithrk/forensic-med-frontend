@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { postMortemService, type PostMortemDto } from '../../services/postmortem.service';
 import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, ClipboardList, Crosshair } from 'lucide-react';
 import { MediaGalleryView } from '../media/MediaGalleryView';
+import { ReportHistoryWidget } from '../reports/ReportHistoryWidget';
 
 const PostmortemView: React.FC = () => {
   const { deceasedId, pmId } = useParams<{ deceasedId: string, pmId: string }>();
@@ -154,6 +155,8 @@ const PostmortemView: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ReportHistoryWidget caseType="POSTMORTEM" caseId={Number(pmId)} />
 
       <MediaGalleryView linkType="POSTMORTEM" linkId={Number(pmId)} />
       

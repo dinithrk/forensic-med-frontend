@@ -19,10 +19,10 @@ import PostmortemView from './features/postmortem/PostmortemView';
 import { EvidenceList } from './features/evidence/EvidenceList';
 import { EvidenceForm } from './features/evidence/EvidenceForm';
 import { EvidenceView } from './features/evidence/EvidenceView';
+import { ReportsPage } from './features/reports/ReportsPage';
 
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
-const Reports = () => <div className="p-8 text-xl">Court Report Management</div>;
 const Staff = () => <div className="p-8 text-xl text-blue-700">Staff Management (Admin Only)</div>;
 
 const App: React.FC = () => {
@@ -208,7 +208,7 @@ const App: React.FC = () => {
               path="reports" 
               element={
                 <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
-                  <Reports />
+                  <ReportsPage />
                 </ProtectedRoute>
               } 
             />
