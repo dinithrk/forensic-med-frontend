@@ -28,15 +28,23 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Clear local state
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Redirect to login (avoiding react-router hooks here as it's outside the component tree)
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Clear local state
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Redirect to login (avoiding react-router hooks here as it's outside the component tree)
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      } else if (error.response.status === 400) {
+        alert("Validation Error: Please check the data you entered.");
+      } else if (error.response.status >= 500) {
+        alert("Server Error: Something went wrong on our end. Please try again later.");
       }
+    } else if (error.request) {
+      alert("Network Error: Could not connect to the server. Please check your internet connection.");
     }
     return Promise.reject(error);
   }

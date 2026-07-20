@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { caseService, type MlefRecord } from '../../services/case.service';
-import { Plus, Search, Edit, Eye, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Search, Eye, FileText, Loader2, AlertCircle } from 'lucide-react';
 
 const CaseList: React.FC = () => {
   const [cases, setCases] = useState<MlefRecord[]>([]);

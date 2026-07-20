@@ -16,10 +16,12 @@ import PostmortemForm from './features/postmortem/PostmortemForm';
 import DeceasedForm from './features/postmortem/DeceasedForm';
 import DeceasedView from './features/postmortem/DeceasedView';
 import PostmortemView from './features/postmortem/PostmortemView';
+import { EvidenceList } from './features/evidence/EvidenceList';
+import { EvidenceForm } from './features/evidence/EvidenceForm';
+import { EvidenceView } from './features/evidence/EvidenceView';
 
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
-const Evidence = () => <div className="p-8 text-xl">Evidence / Chain of Custody Module</div>;
 const Reports = () => <div className="p-8 text-xl">Court Report Management</div>;
 const Staff = () => <div className="p-8 text-xl text-blue-700">Staff Management (Admin Only)</div>;
 
@@ -175,14 +177,32 @@ const App: React.FC = () => {
               />
             </Route>
 
-            <Route 
-              path="evidence" 
-              element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'LABORATORY_STAFF', 'POLICE_OFFICER']}>
-                  <Evidence />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="evidence">
+              <Route 
+                index 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'LABORATORY_STAFF', 'POLICE_OFFICER']}>
+                    <EvidenceList />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="new" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'LABORATORY_STAFF', 'POLICE_OFFICER']}>
+                    <EvidenceForm />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path=":id" 
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'LABORATORY_STAFF', 'POLICE_OFFICER']}>
+                    <EvidenceView />
+                  </ProtectedRoute>
+                } 
+              />
+            </Route>
 
             <Route 
               path="reports" 

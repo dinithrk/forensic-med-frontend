@@ -183,7 +183,7 @@ const PostmortemForm: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">
             {pmId ? 'Edit Postmortem Exam' : 'Register New Autopsy'}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">For Deceased ID: DEC-{deceasedId.padStart(4, '0')}</p>
+          <p className="text-sm text-gray-500 mt-1">For Deceased ID: DEC-{deceasedId?.padStart(4, '0') || 'Unknown'}</p>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { deceasedService, postMortemService, type DeceasedDto, type PostMortemDto } from '../../services/postmortem.service';
-import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, User, MapPin, Plus, FileSearch } from 'lucide-react';
+import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, User, Plus, FileSearch } from 'lucide-react';
 
 const DeceasedView: React.FC = () => {
   const { deceasedId } = useParams<{ deceasedId: string }>();

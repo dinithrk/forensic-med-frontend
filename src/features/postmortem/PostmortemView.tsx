@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { postMortemService, type PostMortemDto } from '../../services/postmortem.service';
 import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, ClipboardList, Crosshair } from 'lucide-react';
+import { MediaGalleryView } from '../media/MediaGalleryView';
 
 const PostmortemView: React.FC = () => {
   const { deceasedId, pmId } = useParams<{ deceasedId: string, pmId: string }>();
@@ -153,6 +154,9 @@ const PostmortemView: React.FC = () => {
           </div>
         </div>
       )}
+
+      <MediaGalleryView linkType="POSTMORTEM" linkId={Number(pmId)} />
+      
     </div>
   );
 };

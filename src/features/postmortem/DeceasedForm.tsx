@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { deceasedService, type DeceasedDto, type Gender } from '../../services/postmortem.service';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { deceasedService, type DeceasedDto } from '../../services/postmortem.service';
 import { Loader2, ArrowLeft, Save, Plus, Trash2, AlertCircle } from 'lucide-react';
 
 const DeceasedForm: React.FC = () => {
@@ -53,7 +53,7 @@ const DeceasedForm: React.FC = () => {
         inquestOrder: data.inquestOrder ? {
           ...data.inquestOrder,
           dateOfInquest: data.inquestOrder.dateOfInquest ? String(data.inquestOrder.dateOfInquest).split('T')[0] : '',
-          inquestNumber: data.inquestOrder.inquestNumber || '',
+          inquestNumber: data.inquestOrder.inquestNumber || undefined,
           inquirerFullName: data.inquestOrder.inquirerFullName || '',
           inquirerDesignation: data.inquestOrder.inquirerDesignation || '',
           magistrate: data.inquestOrder.magistrate || '',
@@ -389,7 +389,7 @@ const DeceasedForm: React.FC = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Full Name</label>
                         <input 
                           type="text" 
-                          {...register(`identifiers.${index}.fullName` as const)} 
+                          {...register(`identifiers.${index}.fullName` as any)} 
                           className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 text-sm" 
                         />
                       </div>
@@ -398,7 +398,7 @@ const DeceasedForm: React.FC = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Relationship</label>
                         <input 
                           type="text" 
-                          {...register(`identifiers.${index}.relationship` as const)} 
+                          {...register(`identifiers.${index}.relationship` as any)} 
                           placeholder="e.g. Spouse, Police Officer"
                           className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 text-sm" 
                         />
@@ -408,7 +408,7 @@ const DeceasedForm: React.FC = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">NIC No</label>
                         <input 
                           type="text" 
-                          {...register(`identifiers.${index}.nicNumber` as const)} 
+                          {...register(`identifiers.${index}.nicNumber` as any)} 
                           className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 text-sm" 
                         />
                       </div>
@@ -417,7 +417,7 @@ const DeceasedForm: React.FC = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Contact No</label>
                         <input 
                           type="text" 
-                          {...register(`identifiers.${index}.contactNo` as const)} 
+                          {...register(`identifiers.${index}.contactNo` as any)} 
                           className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 text-sm" 
                         />
                       </div>
@@ -426,7 +426,7 @@ const DeceasedForm: React.FC = () => {
                         <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
                         <input 
                           type="text" 
-                          {...register(`identifiers.${index}.residingAddress` as const)} 
+                          {...register(`identifiers.${index}.residingAddress` as any)} 
                           className="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 text-sm" 
                         />
                       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { patientService, type Patient, type Gender } from '../../services/patient.service';
+import { patientService, type Patient } from '../../services/patient.service';
 import { Loader2, ArrowLeft, Save } from 'lucide-react';
 
 const PatientForm: React.FC = () => {

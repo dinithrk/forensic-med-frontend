@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { caseService, type MlefRecord } from '../../services/case.service';
-import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, Calendar, Crosshair, Shield, Activity, Droplets } from 'lucide-react';
+import { Loader2, ArrowLeft, Edit, AlertCircle, FileText, Crosshair, Shield, Activity, Droplets } from 'lucide-react';
+import { MediaGalleryView } from '../media/MediaGalleryView';
 
 const CaseView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -278,6 +279,9 @@ const CaseView: React.FC = () => {
           )}
         </div>
       </div>
+      
+      <MediaGalleryView linkType="CASE" linkId={Number(id)} />
+
     </div>
   );
 };

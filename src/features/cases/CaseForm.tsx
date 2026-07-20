@@ -106,7 +106,7 @@ const CaseForm: React.FC = () => {
 
     try {
       const savedCase = await (isEditMode && id ? caseService.update(parseInt(id, 10), formData) : caseService.create(formData));
-      navigate(`/cases/${savedCase.mlefSerialNo}`);
+      navigate(`/cases/${savedCase.mlefId}`);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save case record. Please check the inputs.');
     } finally {
