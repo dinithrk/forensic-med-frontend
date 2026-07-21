@@ -3,9 +3,15 @@ import { reportService, type ForensicReportDto, type ReportStatus } from '../../
 import { generateReportPdf, printReportPdf } from './pdfGenerator';
 import { ReportGeneratorModal } from './ReportGeneratorModal';
 import { ReportNotificationsWidget } from './ReportNotificationsWidget';
-import { FileText, Search, Download, Printer, CheckCircle, Send, CheckSquare, Clock, RefreshCw, Loader2 } from 'lucide-react';
+import { DailyReportView } from './management/DailyReportView';
+import { MonthlyReportView } from './management/MonthlyReportView';
+import { PendingCasesReportView } from './management/PendingCasesReportView';
+import { CourtReportView } from './management/CourtReportView';
+import { StatisticalReportView } from './management/StatisticalReportView';
+import { FileText, Search, Download, Printer, CheckCircle, Send, CheckSquare, Clock, RefreshCw, Loader2, Calendar, AlertCircle, Scale, PieChart } from 'lucide-react';
 
 export const ReportsPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'all_reports' | 'daily' | 'monthly' | 'pending' | 'court' | 'statistical'>('all_reports');
   const [reports, setReports] = useState<ForensicReportDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,15 +76,83 @@ export const ReportsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
+      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Court Report Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Forensic Department Reports Hub</h1>
           <p className="text-sm text-gray-500">
-            Generate, track, and dispatch Medico-Legal & Postmortem Reports for Court Proceedings.
+            Generate court reports, daily logs, monthly statistics, pending case audits, and departmental analytics.
           </p>
         </div>
       </div>
+
+      {/* Main Category Tabs */}
+      <div className="flex space-x-1 border-b border-gray-200 bg-white p-1.5 rounded-xl border shadow-xs overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('all_reports')}
+          className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'all_reports' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <FileText className="w-3.5 h-3.5 mr-2" />
+          Court Individual Reports
+        </button>
+        <button
+          onClick={() => setActiveTab('daily')}
+          className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'daily' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <Calendar className="w-3.5 h-3.5 mr-2" />
+          Daily Case Report
+        </button>
+        <button
+          onClick={() => setActiveTab('monthly')}
+          className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'monthly' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <Calendar className="w-3.5 h-3.5 mr-2" />
+          Monthly Report
+        </button>
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'pending' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <AlertCircle className="w-3.5 h-3.5 mr-2" />
+          Pending Cases Report
+        </button>
+        <button
+          onClick={() => setActiveTab('court')}
+          className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'court' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <Scale className="w-3.5 h-3.5 mr-2" />
+          Court Report
+        </button>
+        <button
+          onClick={() => setActiveTab('statistical')}
+          className={`flex items-center px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+            activeTab === 'statistical' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <PieChart className="w-3.5 h-3.5 mr-2" />
+          Statistical Report
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'daily' && <DailyReportView />}
+      {activeTab === 'monthly' && <MonthlyReportView />}
+      {activeTab === 'pending' && <PendingCasesReportView />}
+      {activeTab === 'court' && <CourtReportView />}
+      {activeTab === 'statistical' && <StatisticalReportView />}
+
+      {activeTab === 'all_reports' && (
+        <>
 
       {/* Metrics Bar */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
@@ -169,6 +243,7 @@ export const ReportsPage: React.FC = () => {
               >
                 <option value="ALL">All Report Types</option>
                 <option value="MLR">MLR Report</option>
+                <option value="MLEF">MLEF Form</option>
                 <option value="PMR">Postmortem (PMR)</option>
                 <option value="CERTIFICATE_OF_RECEIPT">Certificate of Receipt</option>
               </select>
@@ -276,6 +351,8 @@ export const ReportsPage: React.FC = () => {
           existingReport={selectedReport}
           onReportSaved={fetchAllReports}
         />
+      )}
+        </>
       )}
     </div>
   );

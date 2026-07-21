@@ -15,6 +15,8 @@ export const buildReportPdfDoc = (report: ForensicReportDto): jsPDF => {
     generateCertificateOfReceiptPdf(doc, report, details);
   } else if (report.reportType === 'PMR') {
     generatePostmortemReportPdf(doc, report, details);
+  } else if (report.reportType === 'MLEF') {
+    generateMlefReportPdf(doc, report, details);
   } else {
     generateMlrReportPdf(doc, report, details);
   }
@@ -493,4 +495,608 @@ const generateCertificateOfReceiptPdf = (doc: jsPDF, report: ForensicReportDto, 
   doc.text('Signature & Official Court Seal', 125, y);
   y += 4;
   doc.text(`SLMC Reg No: ${report.doctorSlmcNo || 'N/A'}`, 20, y);
+};
+
+// --- Medico-Legal Examination Form (MLEF) ---
+const generateMlefReportPdf = (doc: jsPDF, report: ForensicReportDto, details: any) => {
+  // Header
+  doc.setFillColor(6, 78, 59); // Dark Emerald Green
+  doc.rect(0, 0, 210, 28, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text('MEDICO-LEGAL EXAMINATION FORM (MLEF)', 105, 12, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('DEPARTMENT OF FORENSIC MEDICINE & CLINICAL TOXICOLOGY', 105, 18, { align: 'center' });
+  doc.text('OFFICIAL CLINICAL EXAMINATION RECORD', 105, 23, { align: 'center' });
+
+  let y = 36;
+
+  const checkPageBreak = (neededHeight: number) => {
+    if (y + neededHeight > 275) {
+      doc.addPage();
+      y = 20;
+    }
+  };
+
+  // Metadata Box
+  doc.setDrawColor(200, 200, 200);
+  doc.setFillColor(248, 250, 252);
+  doc.rect(14, y, 182, 28, 'FD');
+
+  doc.setTextColor(50, 50, 50);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`MLEF Serial No:`, 18, y + 6);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${report.serialNo || 'N/A'} (v${report.versionNumber || 1})`, 50, y + 6);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Police Station:`, 18, y + 12);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${report.policeStation || 'N/A'}`, 50, y + 12);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Police Ref No:`, 18, y + 18);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${report.policeRefNo || 'N/A'}`, 50, y + 18);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Police Issue Date:`, 18, y + 24);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${details.policeDateOfIssue || 'N/A'}`, 50, y + 24);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Court Name:`, 110, y + 6);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${report.courtName || 'N/A'}`, 140, y + 6);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Court Case No:`, 110, y + 12);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${report.courtCaseNo || 'N/A'}`, 140, y + 12);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Date of Trial:`, 110, y + 18);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${report.dateOfTrial || 'N/A'}`, 140, y + 18);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Brought By Officer:`, 110, y + 24);
+  doc.setFont('helvetica', 'normal');
+  const officerText = details.broughtByOfficerName ? `${details.broughtByOfficerRank || ''} ${details.broughtByOfficerName} (Reg: ${details.broughtByOfficerRegNo || 'N/A'})` : 'N/A';
+  doc.text(officerText, 140, y + 24);
+
+  y += 35;
+
+  // Section 1: Patient Information & Admission
+  doc.setFillColor(209, 250, 229);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 78, 59);
+  doc.text('1. PATIENT PARTICULARS & HOSPITAL ADMISSION DETAILS', 18, y + 5);
+
+  y += 11;
+  doc.setFontSize(9);
+  doc.setTextColor(40, 40, 40);
+
+  const patRows = [
+    ['Full Name:', details.patientName || report.subjectName || 'N/A', 'Age / Gender:', `${details.patientAge || 'N/A'} yrs / ${details.patientSex || 'N/A'}`],
+    ['NIC / Passport:', details.patientNic || 'N/A', 'Address:', details.patientAddress || 'N/A'],
+    ['Hospital Name:', details.hospitalName || 'N/A', 'Ward & BHT:', `Ward: ${details.hospitalWard || 'N/A'} | BHT: ${details.hospitalBhtNo || 'N/A'}`],
+    ['Date Admitted:', details.dateAdmitted ? `${details.dateAdmitted} (${details.timeAdmitted || 'N/A'})` : 'N/A', 'Date Discharged:', details.dateDischarged || 'N/A']
+  ];
+
+  patRows.forEach(row => {
+    doc.setFont('helvetica', 'bold');
+    doc.text(row[0], 18, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(row[1], 50, y);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text(row[2], 120, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(row[3], 150, y);
+    y += 6;
+  });
+
+  y += 4;
+
+  // Section 2: Examination & Referral Reason
+  checkPageBreak(30);
+  doc.setFillColor(209, 250, 229);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 78, 59);
+  doc.text('2. CLINICAL EXAMINATION & REFERRAL DETAILS', 18, y + 5);
+
+  y += 11;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date & Time Examined:', 18, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(report.examinationDate ? new Date(report.examinationDate).toLocaleString() : 'N/A', 62, y);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Place Examined:', 120, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(details.placeExamined || 'N/A', 150, y);
+
+  y += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Reason for Referral:', 18, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(details.reasonForReferral || 'N/A', 62, y);
+
+  y += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Short History (by Patient):', 18, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  const historyText = details.shortHistory || 'No statement recorded.';
+  const splitHistory = doc.splitTextToSize(historyText, 175);
+  doc.text(splitHistory, 18, y);
+  y += (splitHistory.length * 5) + 4;
+
+  // Section 3: Substance & Alcohol Evaluation
+  checkPageBreak(35);
+  doc.setFillColor(209, 250, 229);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 78, 59);
+  doc.text('3. SOBRIETY & SUBSTANCE INFLUENCE EVALUATION', 18, y + 5);
+
+  y += 11;
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(40, 40, 40);
+  doc.text('Breathing Smell Intensity:', 18, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(details.breathingSmellIntensity || 'None', 65, y);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Alcohol Influence:', 115, y);
+  doc.setFont('helvetica', 'normal');
+  const alc = details.alcoholInfluence || 'NEGATIVE';
+  doc.text(`[${alc === 'NEGATIVE' ? 'X' : ' '}] Negative  [${alc === 'CONSUMED_SMELLING' ? 'X' : ' '}] Smelling  [${alc === 'UNDER_INFLUENCE' ? 'X' : ' '}] Under Influence`, 145, y);
+
+  y += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Drug Consumed:', 18, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`[${details.drugConsumed ? 'X' : ' '}] Yes   [${!details.drugConsumed ? 'X' : ' '}] No`, 65, y);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Drug Influence:', 115, y);
+  doc.setFont('helvetica', 'normal');
+  const drg = details.drugInfluence || 'NEGATIVE';
+  doc.text(`[${drg === 'NEGATIVE' ? 'X' : ' '}] Negative  [${drg === 'CONSUMED_SMELLING' ? 'X' : ' '}] Smelling  [${drg === 'UNDER_INFLUENCE' ? 'X' : ' '}] Under Influence`, 145, y);
+
+  y += 10;
+
+  // Section 4: Bodily Harm Categories Checklist
+  checkPageBreak(40);
+  doc.setFillColor(209, 250, 229);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 78, 59);
+  doc.text('4. NATURE OF BODILY HARM CHECKLIST', 18, y + 5);
+
+  y += 10;
+  const allHarmCategories = [
+    { key: 'Abrasion', label: 'Abrasion' },
+    { key: 'Contusion', label: 'Contusion' },
+    { key: 'Laceration', label: 'Laceration' },
+    { key: 'Stab', label: 'Stab' },
+    { key: 'Cut', label: 'Cut' },
+    { key: 'Fracture', label: 'Fracture' },
+    { key: 'Firearm', label: 'Firearm' },
+    { key: 'Burns', label: 'Burns' },
+    { key: 'Bite', label: 'Bite' },
+    { key: 'Dislocation', label: 'Dislocation' },
+    { key: 'Explosive', label: 'Explosive' },
+    { key: 'Internal Injuries', label: 'Internal Injuries' },
+    { key: 'None', label: 'None' },
+  ];
+
+  let col = 0;
+  allHarmCategories.forEach((cat) => {
+    const xPos = 18 + (col % 4) * 45;
+    const isChecked = details.bodilyHarmSummary && details.bodilyHarmSummary[cat.key] === true;
+    doc.setFont('helvetica', isChecked ? 'bold' : 'normal');
+    doc.setTextColor(isChecked ? 6 : 80, isChecked ? 78 : 80, isChecked ? 59 : 80);
+    doc.text(`[${isChecked ? 'X' : '  '}] ${cat.label}`, xPos, y);
+    col++;
+    if (col % 4 === 0) y += 6;
+  });
+  if (col % 4 !== 0) y += 6;
+
+  if (details.othersNatureOfHarm) {
+    y += 4;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 40, 40);
+    doc.text('Others (Nature of Harm):', 18, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    const harmOtherSplit = doc.splitTextToSize(details.othersNatureOfHarm, 175);
+    doc.text(harmOtherSplit, 18, y);
+    y += (harmOtherSplit.length * 5);
+  }
+
+  y += 6;
+
+  // Section 5: Sexual Assault Examination Findings
+  checkPageBreak(35);
+  doc.setFillColor(209, 250, 229);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 78, 59);
+  doc.text('5. SEXUAL ASSAULT EXAMINATION FINDINGS', 18, y + 5);
+
+  y += 11;
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(40, 40, 40);
+
+  const saVag = details.signsVaginalHymenPenetration === true;
+  const saAnal = details.signsAnalPenetration === true;
+  const saInter = details.signsInterLabialPenetration === true;
+
+  doc.text(`[${saVag ? 'X' : '  '}] Signs of Vaginal/Hymen Penetration`, 18, y);
+  doc.text(`[${saAnal ? 'X' : '  '}] Signs of Anal Penetration`, 110, y);
+  y += 6;
+  doc.text(`[${saInter ? 'X' : '  '}] Signs of Inter-Labial Penetration`, 18, y);
+
+  if (details.sexualAssaultBriefHistory) {
+    y += 7;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Brief History / Observations:', 18, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    const saHistorySplit = doc.splitTextToSize(details.sexualAssaultBriefHistory, 175);
+    doc.text(saHistorySplit, 18, y);
+    y += (saHistorySplit.length * 5);
+  }
+  y += 6;
+
+  // Section 6: Specialist Referrals Log (if any)
+  if (details.referrals && details.referrals.length > 0) {
+    checkPageBreak(30);
+    doc.setFillColor(209, 250, 229);
+    doc.rect(14, y, 182, 7, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(6, 78, 59);
+    doc.text('6. SPECIALIST REFERRALS LOG', 18, y + 5);
+
+    y += 9;
+    const refData = details.referrals.map((r: any, idx: number) => [
+      idx + 1,
+      r.consultant || 'N/A',
+      r.specialty || 'N/A',
+      r.reason || 'N/A',
+      r.reportReceived ? 'RECEIVED' : 'PENDING'
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [['#', 'Referred Consultant', 'Specialty', 'Referral Reason', 'Status']],
+      body: refData,
+      theme: 'grid',
+      headStyles: { fillColor: [6, 78, 59], textColor: 255, fontSize: 8 },
+      bodyStyles: { fontSize: 8 },
+      margin: { left: 14, right: 14 }
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 8;
+  }
+
+  // Section 7: Individual Injuries Log Table
+  checkPageBreak(40);
+  doc.setFillColor(209, 250, 229);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(6, 78, 59);
+  doc.text('7. INDIVIDUAL INJURIES LOG', 18, y + 5);
+
+  y += 9;
+
+  const injuriesData = (details.injuries && details.injuries.length > 0) ?
+    details.injuries.map((i: any, idx: number) => [
+      idx + 1,
+      i.type || 'N/A',
+      i.size || 'N/A',
+      i.placement || 'N/A',
+      i.weapon || 'N/A',
+      i.observations || '-'
+    ]) : [['-', 'No individual injuries recorded', '-', '-', '-', '-']];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['#', 'Injury Class', 'Dimensions', 'Body Location', 'Weapon', 'Remarks']],
+    body: injuriesData,
+    theme: 'grid',
+    headStyles: { fillColor: [6, 78, 59], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 8;
+
+  // Sign off
+  checkPageBreak(35);
+  doc.setDrawColor(180, 180, 180);
+  doc.line(14, y, 196, y);
+  y += 8;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('EXAMINING MEDICAL OFFICER SIGNATURE & CERTIFICATION:', 14, y);
+  y += 15;
+
+  doc.line(130, y, 190, y);
+  y += 4;
+  doc.setFont('helvetica', 'bold');
+  doc.text(report.doctorName || 'Dr. Judicial Medical Officer', 130, y);
+  y += 4;
+  doc.setFont('helvetica', 'normal');
+  doc.text(report.doctorDesignation || 'Judicial Medical Officer', 130, y);
+  y += 4;
+  doc.text(`SLMC Reg No: ${report.doctorSlmcNo || 'N/A'}`, 130, y);
+};
+
+// --- Management Reports PDF Exporters ---
+
+export const exportDailyReportPdf = (data: any) => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  doc.setFillColor(30, 58, 138);
+  doc.rect(0, 0, 210, 24, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('DAILY FORENSIC CASE LOG REPORT', 105, 12, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Date of Audit: ${data.date || new Date().toISOString().slice(0, 10)}`, 105, 18, { align: 'center' });
+
+  let y = 32;
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Total Examinations Logged: ${data.totalCases} (Clinical: ${data.totalClinicalCases} | Postmortem: ${data.totalPostmortemCases})`, 14, y);
+  y += 8;
+
+  const tableBody = (data.items && data.items.length > 0) ?
+    data.items.map((i: any, idx: number) => [
+      idx + 1,
+      i.caseType,
+      i.referenceNo,
+      i.subjectName,
+      i.policeStation,
+      i.dateTimeExamined ? new Date(i.dateTimeExamined).toLocaleString() : 'N/A',
+      i.doctorName
+    ]) : [['-', 'No cases logged for selected date', '-', '-', '-', '-', '-']];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['#', 'Type', 'Reference No', 'Subject Name', 'Police Ref/Dist', 'Date/Time Examined', 'Doctor']],
+    body: tableBody,
+    theme: 'grid',
+    headStyles: { fillColor: [30, 58, 138], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save(`Daily_Case_Report_${data.date || 'today'}.pdf`);
+};
+
+export const exportMonthlyReportPdf = (data: any) => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, 210, 24, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text(`MONTHLY FORENSIC PERFORMANCE REPORT - ${data.monthName} ${data.year}`, 105, 12, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('DEPARTMENTAL CASELOAD & WORKLOAD AUDIT', 105, 18, { align: 'center' });
+
+  let y = 32;
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  doc.setFont('helvetica', 'bold');
+  doc.text('1. MONTHLY CASELOAD SUMMARY', 14, y);
+  y += 7;
+
+  const summaryData = [
+    ['Clinical (MLEF) Reports', data.totalClinical],
+    ['Postmortem (PMR) Reports', data.totalPostmortem],
+    ['Finalized Reports', data.totalFinalized],
+    ['Dispatched to Court', data.totalDispatched]
+  ];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['Category Metric', 'Monthly Count']],
+    body: summaryData,
+    theme: 'grid',
+    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 110 }
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 10;
+  doc.setFont('helvetica', 'bold');
+  doc.text('2. MEDICAL OFFICER WORKLOAD AUDIT', 14, y);
+  y += 7;
+
+  const docBody = (data.doctorWorkload && data.doctorWorkload.length > 0) ?
+    data.doctorWorkload.map((d: any, idx: number) => [
+      idx + 1,
+      d.doctorName,
+      d.clinicalCount,
+      d.postmortemCount,
+      d.totalCount
+    ]) : [['-', 'No workload records', '-', '-', '-']];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['#', 'Doctor / Pathologist', 'Clinical Cases', 'Postmortem Cases', 'Total Workload']],
+    body: docBody,
+    theme: 'grid',
+    headStyles: { fillColor: [30, 58, 138], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save(`Monthly_Forensic_Report_${data.monthName}_${data.year}.pdf`);
+};
+
+export const exportPendingReportPdf = (data: any) => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  doc.setFillColor(185, 28, 28); // Red
+  doc.rect(0, 0, 210, 24, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('OVERDUE & PENDING CASES AUDIT REPORT', 105, 12, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 105, 18, { align: 'center' });
+
+  let y = 32;
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Overdue Draft Reports (> 3 Days): ${data.overdueDraftsCount}`, 14, y);
+  y += 7;
+
+  const overdueBody = (data.overdueDrafts && data.overdueDrafts.length > 0) ?
+    data.overdueDrafts.map((o: any, idx: number) => [
+      idx + 1,
+      o.caseType,
+      o.referenceNo,
+      o.subjectName,
+      `${o.daysOverdue} Days`,
+      o.assignedDoctor
+    ]) : [['-', 'No overdue draft reports pending!', '-', '-', '-', '-']];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['#', 'Type', 'Ref No', 'Subject Name', 'Days Overdue', 'Assigned Doctor']],
+    body: overdueBody,
+    theme: 'grid',
+    headStyles: { fillColor: [185, 28, 28], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save(`Pending_Cases_Audit_${new Date().toISOString().slice(0, 10)}.pdf`);
+};
+
+export const exportCourtReportPdf = (data: any) => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  doc.setFillColor(88, 28, 135); // Purple
+  doc.rect(0, 0, 210, 24, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('COURT PROCEEDINGS & TRIAL SCHEDULE REPORT', 105, 12, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 105, 18, { align: 'center' });
+
+  let y = 32;
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Upcoming Trial Dates: ${data.upcomingTrialsCount}`, 14, y);
+  y += 7;
+
+  const trialBody = (data.upcomingTrials && data.upcomingTrials.length > 0) ?
+    data.upcomingTrials.map((t: any, idx: number) => [
+      idx + 1,
+      t.courtName,
+      t.courtCaseNo,
+      t.subjectName,
+      t.dateOfTrial,
+      `${t.daysUntilTrial} Days`
+    ]) : [['-', 'No upcoming court trial dates scheduled', '-', '-', '-', '-']];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['#', 'Court Name', 'Case No', 'Subject Name', 'Date of Trial', 'Countdown']],
+    body: trialBody,
+    theme: 'grid',
+    headStyles: { fillColor: [88, 28, 135], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save(`Court_Schedule_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+};
+
+export const exportStatisticalReportPdf = (data: any) => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  doc.setFillColor(6, 78, 59); // Emerald
+  doc.rect(0, 0, 210, 24, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('DEPARTMENTAL STATISTICAL & ANALYTICAL SUMMARY', 105, 12, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Total Recorded Cases Analyzed: ${data.totalCases}`, 105, 18, { align: 'center' });
+
+  let y = 32;
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  doc.setFont('helvetica', 'bold');
+  doc.text('1. DEMOGRAPHIC & CASE TYPE DISTRIBUTION', 14, y);
+  y += 7;
+
+  const demoBody = [
+    ['Total Registered Cases', data.totalCases],
+    ['Clinical Cases (MLEF)', data.caseTypeBreakdown ? data.caseTypeBreakdown['Clinical (MLEF)'] || 0 : 0],
+    ['Postmortem Cases (PMR)', data.caseTypeBreakdown ? data.caseTypeBreakdown['Postmortem (PMR)'] || 0 : 0],
+    ['Male Subjects', data.genderDistribution ? data.genderDistribution['Male'] || 0 : 0],
+    ['Female Subjects', data.genderDistribution ? data.genderDistribution['Female'] || 0 : 0]
+  ];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['Demographic Metric', 'Count']],
+    body: demoBody,
+    theme: 'grid',
+    headStyles: { fillColor: [6, 78, 59], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 110 }
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 10;
+  doc.setFont('helvetica', 'bold');
+  doc.text('2. BODILY HARM FREQUENCY ANALYTICS', 14, y);
+  y += 7;
+
+  const harmBody = data.bodilyHarmFrequencies ?
+    Object.entries(data.bodilyHarmFrequencies).map(([k, v]) => [k, v]) : [['No harm data', 0]];
+
+  autoTable(doc, {
+    startY: y,
+    head: [['Bodily Harm Category', 'Incidence Count']],
+    body: harmBody,
+    theme: 'grid',
+    headStyles: { fillColor: [6, 78, 59], textColor: 255, fontSize: 8 },
+    bodyStyles: { fontSize: 8 },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save(`Statistical_Forensic_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
 };
