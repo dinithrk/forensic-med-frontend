@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   LogOut,
   Menu,
-  X
+  X,
+  UserCircle
 } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
@@ -37,6 +38,7 @@ const MainLayout: React.FC = () => {
     { name: 'Evidence', path: '/evidence', icon: Scale, roles: ['ADMIN', 'JMO', 'LABORATORY_STAFF', 'POLICE_OFFICER'] },
     { name: 'Reports', path: '/reports', icon: FileText, roles: ['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER'] },
     { name: 'Staff Management', path: '/staff', icon: ShieldCheck, roles: ['ADMIN'] },
+    { name: 'My Profile', path: '/profile', icon: UserCircle },
   ];
 
   // Filter routes based on user role
@@ -98,13 +100,13 @@ const MainLayout: React.FC = () => {
           </button>
           
           <div className="flex-1 flex justify-end items-center space-x-4">
-            <div className="text-sm text-gray-700 font-medium">
+            <NavLink to="/profile" className="text-sm text-gray-700 font-medium hover:text-blue-600 transition-colors flex items-center gap-2 cursor-pointer">
               <span className="hidden sm:inline">Logged in as: </span>
-              <span className="text-gray-900">{user?.email || 'Unknown User'}</span>
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs">
+              <span className="text-gray-900 font-bold">{user?.email || 'Unknown User'}</span>
+              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs">
                 {user?.role || 'No Role'}
               </span>
-            </div>
+            </NavLink>
             <button
               onClick={handleLogout}
               className="flex items-center text-sm font-medium text-gray-500 hover:text-red-600 transition-colors"

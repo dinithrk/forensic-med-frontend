@@ -1086,7 +1086,7 @@ export const exportStatisticalReportPdf = (data: any) => {
   y += 7;
 
   const harmBody = data.bodilyHarmFrequencies ?
-    Object.entries(data.bodilyHarmFrequencies).map(([k, v]) => [k, v]) : [['No harm data', 0]];
+    Object.entries(data.bodilyHarmFrequencies).map(([k, v]) => [k, String(v)]) : [['No harm data', '0']];
 
   autoTable(doc, {
     startY: y,

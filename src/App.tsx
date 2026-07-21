@@ -21,9 +21,11 @@ import { EvidenceForm } from './features/evidence/EvidenceForm';
 import { EvidenceView } from './features/evidence/EvidenceView';
 import { ReportsPage } from './features/reports/ReportsPage';
 
+import { StaffDashboard } from './features/admin/StaffDashboard';
+import { ProfileView } from './features/profile/ProfileView';
+
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
-const Staff = () => <div className="p-8 text-xl text-blue-700">Staff Management (Admin Only)</div>;
 
 const App: React.FC = () => {
   return (
@@ -214,10 +216,19 @@ const App: React.FC = () => {
             />
 
             <Route 
+              path="profile" 
+              element={
+                <ProtectedRoute>
+                  <ProfileView />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
               path="staff" 
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>
-                  <Staff />
+                  <StaffDashboard />
                 </ProtectedRoute>
               } 
             />
