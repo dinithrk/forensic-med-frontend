@@ -23,6 +23,7 @@ import { ReportsPage } from './features/reports/ReportsPage';
 
 import { StaffDashboard } from './features/admin/StaffDashboard';
 import { ProfileView } from './features/profile/ProfileView';
+import { AnalyticsDashboard } from './features/analytics/AnalyticsDashboard';
 
 // --- Placeholder Components ---
 const Unauthorized = () => <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-600">403 - Unauthorized Access</div>;
@@ -49,6 +50,15 @@ const App: React.FC = () => {
             <Route index element={<Navigate to="/dashboard" replace />} />
             
             <Route path="dashboard" element={<Dashboard />} />
+            
+            <Route 
+              path="analytics" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER']}>
+                  <AnalyticsDashboard />
+                </ProtectedRoute>
+              } 
+            />
             
             <Route path="patients">
               <Route 

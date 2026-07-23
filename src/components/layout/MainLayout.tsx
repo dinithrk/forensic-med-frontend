@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   X,
-  UserCircle
+  UserCircle,
+  BarChart3
 } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
@@ -32,6 +33,7 @@ const MainLayout: React.FC = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Analytics', path: '/analytics', icon: BarChart3, roles: ['ADMIN', 'JMO', 'MEDICAL_OFFICER', 'CLERICAL_OFFICER'] },
     { name: 'Patients', path: '/patients', icon: Users, roles: ['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER'] },
     { name: 'Cases', path: '/cases', icon: FolderOpen, roles: ['ADMIN', 'MEDICAL_OFFICER', 'JMO', 'CLERICAL_OFFICER', 'POLICE_OFFICER'] },
     { name: 'Postmortems', path: '/postmortems', icon: ClipboardList, roles: ['ADMIN', 'JMO', 'MEDICAL_OFFICER'] },
